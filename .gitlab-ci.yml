@@ -1,0 +1,16 @@
+before_script:
+  - uname -r 
+
+types:
+  - build
+  - test
+  - deploy
+
+job_test:
+  type: test
+  script:
+    - uname -r 
+  only:
+    - master
+  tags:
+    - ruby

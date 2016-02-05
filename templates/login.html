@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <title>EBCInSight - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <!-- Bootstrap CSS -->
+    <link href="./static/assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./static/assets/libs/bootstrap/css/sb-admin.css" rel="stylesheet">
+    <link href="./static/assets/libs/bootstrap/css/simple-sidebar.css" rel="stylesheet">
+    <!-- materialize-->
+    <link href="./static/assets/libs/materialize/css/materialize.min.css" rel="stylesheet" type="text/css" />
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <!-- Custom Views -->
+    <link href="./static/assets/stylesheets/common.css" rel="stylesheet" type="text/css">
+
+
+
+
+</head>
+<body>
+    <!-- jQuery -->
+    <script src="./static/assets/libs/jquery/jquery.min.js"></script>
+    <!-- jQueryUI -->
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="./static/assets/libs/bootstrap/bootstrap.min.js"></script>
+    <!-- materialize -->
+    <script src="./static/assets/libs/materialize/js/materialize.min.js"></script>
+
+    <div class="login_reg_selectbar">
+      <a class="waves-effect waves-light btn disabled" href="./login">登入</a>
+      <a class="waves-effect waves-light btn" href="./register">註冊</a>
+    </div>
+
+  <div id="mainContanter" class="container login">
+  <form class="form-signin" action="" method="post">
+
+  <div class="row">
+      <div class="row">
+        <div class="col s12">
+          <h3 class="">EBCInSight</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input  id="username"
+                  type="text"
+                  name="username"
+                  class="validate"
+                  value="{{request.form.username }}">
+          <label for="username">User Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input  id="userpassword"
+                  type="password"
+                  name="password"
+                  class="validate"
+                  value="{{request.form.password }}">
+          <label for="regpassword">Password</label>
+        </div>
+      </div>
+
+     <div class="row">
+       <div class=" col s12">
+         <button id="loginbtn" class="waves-effect waves-light  blue darken-3 submitbtn btn" type="button">登入</button>
+       </div>
+     </div>
+  </form>
+  </div>
+
+  <div id="alertmsg" class="red lighten-1 alertmsg">
+    <p></p>
+  </div>
+<script type="text/javascript">
+
+$( document ).ready(function() {
+
+
+  $("#loginbtn").click(function(){
+
+      if(passwordCheck())
+      {
+        sendsubbmit();
+      }
+  });
+
+  $("#alertmsg").hide();
+});
+function passwordCheck()
+{
+
+  if($("#userpassword").val() == "")
+  {
+    alertmsg("密碼不可空白！！");
+    return false;
+  }
+  else
+    return true;
+}
+function alertmsg(text)
+{
+  $("#alertmsg p").text(text);
+  $("#alertmsg").fadeIn(300);
+  setTimeout(function(){
+    $("#alertmsg").fadeOut(500);
+  },2000);
+}
+function sendsubbmit()
+{
+  var name = $("#username").val() ;
+  var password = $("#userpassword").val() ;
+
+  if(name.indexOf('@'))
+  {
+    name = getUserName(name);
+  }
+
+  UIlock(true);
+  console.log("[ajax] post data ");
+  $.ajax({
+    type: 'POST',
+    url: "/login",
+    data: { username:name,
+            password:password },
+    success: function(result)
+    {
+      var tempdata  = jQuery.parseJSON(result);
+      console.log("[ajax] result :",tempdata.result);
+      summitresult(tempdata.result);
+    }
+  });
+
+}
+function getUserName(item)
+{
+    console.log("getUserName :",item);
+    var tmp = item.split("@");
+    return tmp[0];
+}
+
+function summitresult(result,email)
+{
+  if(result == "success")
+  {
+    window.location.href = "/";
+  }
+  else if (result == "not_activated")
+  {
+    alertmsg("此帳號未啟動！請至您的信箱完成帳號認證！");
+    UIlock(false);
+  }
+  else
+  {
+    alertmsg(" 登入失敗！帳號或密碼錯誤！");
+    UIlock(false);
+  }
+
+}
+
+function UIlock(status)
+{
+  if(status){
+    $("#loginbtn").prop( "disabled", true );
+  }
+  else{
+    $("#loginbtn").prop( "disabled", false );
+  }
+}
+</script>
+</body>
+</html>

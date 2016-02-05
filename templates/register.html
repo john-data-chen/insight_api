@@ -1,0 +1,233 @@
+<html>
+  <head>
+    <title>EBCInSight - Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="./static/assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./static/assets/libs/bootstrap/css/sb-admin.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="./static/assets/libs/bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- materialize-->
+    <link href="./static/assets/libs/materialize/css/materialize.min.css" rel="stylesheet" type="text/css" />
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <!-- Custom Views -->
+    <link href="./static/assets/stylesheets/common.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <!-- jQuery -->
+    <script src="./static/assets/libs/jquery/jquery.min.js"></script>
+    <!-- jQueryUI -->
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="./static/assets/libs/bootstrap/bootstrap.min.js"></script>
+    <!-- materialize -->
+    <script src="./static/assets/libs/materialize/js/materialize.min.js"></script>
+    <div class="login_reg_selectbar">
+      <a class="waves-effect waves-light btn " href="./login">登入</a>
+      <a class="waves-effect waves-light btn disabled" href="./register">註冊</a>
+    </div>
+
+<div id="mainContanter" class="container reg">
+<form class="form-signin" action="" method="post">
+
+<div class="row">
+    <div class="row">
+      <div class="col s12">
+        <h3 class="">EBCInSight</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="email"
+               type="email"
+               name="username"
+               class="validate"
+               value="@ebc.net.tw">
+        <label for="email">User Name (your_name@ebc.net.tw)</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input  id="regpassword"
+                type="password"
+                name="username"
+                class="validate">
+        <label for="regpassword">Password</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="repassword" type="password" class="validate">
+        <label for="repassword" data-error="密碼不一致！！">Repeat password</label>
+      </div>
+    </div>
+   <div class="row">
+     <div class=" col s12">
+       <button id="regbtn" class="waves-effect waves-light  blue darken-3 submitbtn btn" type="button">註冊</button>
+     </div>
+   </div>
+</form>
+</div>
+
+<div id="alertmsg" class="red lighten-1 alertmsg">
+  <p></p>
+</div>
+
+<script type="text/javascript">
+
+$( document ).ready(function() {
+
+
+  $("#regbtn").click(function(){
+
+      if(passwordCheck())
+      {
+        sendsubbmit();
+      }
+  });
+
+  $("#alertmsg").hide();
+});
+function passwordCheck()
+{
+
+  if($("#regpassword").val() == "" || $("#repassword").val() == "")
+  {
+    alertmsg("密碼不可空白！！");
+    return false;
+  }
+  else if($("#regpassword").val() ==  $("#repassword").val())
+    return true;
+  else
+  {
+    alertmsg("密碼不一致！！");
+    return false;
+  }
+}
+function alertmsg(text)
+{
+  $("#alertmsg p").text(text);
+  $("#alertmsg").fadeIn(300);
+  setTimeout(function(){
+    $("#alertmsg").fadeOut(500);
+  },2000);
+}
+function sendsubbmit()
+{
+  var name = getUserName($("#email").val());
+  var email = $("#email").val();
+  var password = $("#regpassword").val() ;
+
+  if(name == "" || !ebcmailcheck(email))
+  {
+    alertmsg("帳號名稱不完整！");
+    return false;
+  }
+  else
+  {
+
+
+      UIlock(true);
+      console.log("[ajax] post data ");
+      $.ajax({
+        type: 'POST',
+        url: "/register",
+        data: { name:name,
+                email:email,
+                password:password },
+        success: function(result)
+        {
+          var tempdata  = jQuery.parseJSON(result);
+          console.log("[ajax] result :",tempdata.result);
+          summitresult(tempdata.result,email);
+        }
+      });
+  }
+}
+function getUserName(email)
+{
+    var tmp = email.split("@");
+    return tmp[0];
+}
+
+function summitresult(result,email)
+{
+  if(result == "success")
+  {
+    finished(email);
+  }
+  else if (result == "used")
+  {
+    alertmsg("此帳號已註冊！請洽管理員 (john.data_chen@ebc.net.tw)");
+  }
+  else
+  {
+    alertmsg(" 註冊失敗！請洽管理員 (john.data_chen@ebc.net.tw)");
+  }
+
+}
+
+function UIlock(status)
+{
+  if(status){
+    $("#regbtn").prop( "disabled", true );
+  }
+  else{
+    $("#regbtn").prop( "disabled", false );
+  }
+}
+
+function finished(email)
+{
+
+  var str;
+
+
+  str = "<form class='form-signin' action='' method='post'>";
+  str+= "<div class='row'>";
+  str+=     "<div class='row'>";
+  str+=       "<div class='col s12'>";
+  str+=         "<h3>EBCInSight</h3>";
+  str+=       "</div>";
+  str+=     "</div>";
+  str+=     "<div class='row'>";
+  str+=       "<div class='col s12'>";
+  str+=         "<div class='regfinishedInfo'>註冊成功！！帳號啟動連結已寄送至"+email+"</div>";
+  str+=       "</div>";
+  str+=     "</div>";
+  str+=     "<div class='row'>";
+  str+=       "<div class='col s12'>";
+  str+=         "<button id='finishedbtn' class='waves-effect waves-light  blue darken-3 submitbtn btn' type='button' onclick='finishClick();'>完成</button> ";
+  str+=       "</div>";
+  str+=     "</div>";
+  str+= "</div>";
+  str+= "</form>";
+
+  $("#mainContanter").empty();
+  $("#mainContanter").append(str) ;
+}
+
+function ebcmailcheck(email)
+{
+
+  var tmp = email.split("@");
+
+  if('ebc.net.tw'== tmp[1])
+    return true;
+  else
+    return false;
+}
+
+
+function finishClick()
+{
+  window.location.href = "/login";
+}
+
+
+</script>
+</body>
+</html>

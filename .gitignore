@@ -1,0 +1,8 @@
+*.pyc
+*.swp
+venv
+flask_session/*
+.idea
+_RSS_export
+static/assets/pics/news_rss
+static/jarvis_test_files
